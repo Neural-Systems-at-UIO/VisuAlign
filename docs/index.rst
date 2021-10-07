@@ -5,7 +5,7 @@ VisuALign: Software for 2D image registration to 3D atlas
    :caption: VisuAlign documentation
    :maxdepth: 3
 
-   Introduction
+   introduction
    Installation
    support
  
