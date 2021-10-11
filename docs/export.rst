@@ -1,5 +1,5 @@
 **Export of flat files for the QUINT workflow**
--------------------
+-----------------------------------------------------
 
 There is an “Export” function for generating nl.flat files for Nutil (.png-s are created too).
 A message will appear when the export is completed.
