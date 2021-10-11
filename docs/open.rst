@@ -1,7 +1,8 @@
 **2. Open VisuAlign and load the data**
-- Open tool by clicking on “VisuAlign.bat” file. It loads and saves JSON files created by QuickNII,
+----------------------------------------
+Open tool by clicking on “VisuAlign.bat” file. It loads and saves JSON files created by QuickNII,
 
-   File, Open, and choose your JSON file.
+- File, Open, and choose your JSON file.
 
 **Note:** Use the same folder as QuickNII with your png images and
 series descriptor (xml file). You will need the JSON version of the
