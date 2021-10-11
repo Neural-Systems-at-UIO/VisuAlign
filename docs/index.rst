@@ -21,7 +21,12 @@ VisuAlign: Software for 2D image registration to 3D atlas
    :numbered:
    :maxdepth: 3
    
-   
+   open
+   navigate
+   markers
+   saving
+   atlasversion
+   export
    
    
    
