@@ -1,4 +1,4 @@
-**2. Open VisuAlign and load the data**
+**1. Open VisuAlign and load the data**
 ----------------------------------------
 Open tool by clicking on “VisuAlign.bat” file. It loads and saves JSON files created by QuickNII,
 
