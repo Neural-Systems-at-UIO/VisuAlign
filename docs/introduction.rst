@@ -9,4 +9,6 @@ While linear registration tools are vital in bringing experimental image data to
 for precise quantitative analysis one has to address the residual anatomical variability among test subjects after registration.
 VisuAlign is a tool designed for this task. (https://ebrains.eu/service/quicknii-and-visualign).
 
-
+.. image:: a2e4586e8dc145d5bfdcaec7c21ac926/media/image6.png
+      :width: 6.30139in
+      :height: 3.40345in
