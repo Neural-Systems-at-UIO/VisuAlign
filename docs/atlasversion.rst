@@ -13,6 +13,6 @@ A new window will open allowing you to navigate to another atlas version.
    :width: 6.30139in
    :height: 3.62868in
 
-Give a new name and save the new Json file
+Give a new name and save the new Json file.
 
 **Note!** For the Allen mouse atlas, you can also change from CCFv3-2015 to CCFv3_2017 delineations.
