@@ -1,5 +1,5 @@
  
- **2. Navigating between sections**
+ **Navigating between sections**
  ------------------------------------
  Navigating between slices happens in the top-right corner, jump to first section (|<<), jump 10 sections towards the
  start (<10<), and the same towards the end. Keyboard shortcuts for navigation are the Left/Right arrows, moving one section back/forth.  
