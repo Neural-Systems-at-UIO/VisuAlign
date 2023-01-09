@@ -12,7 +12,7 @@ VisuAlign is a tool designed for this task. (https://ebrains.eu/service/quicknii
 .. tip:: 
    **QuickNII and VisuAlign are part of the QUINT workflow**
    
-   Visit `EBRAINS <https://ebrains.eu/service/quint/>`_ for more information about QUINT. Find full user documentation `here <https://quint-workflow.readthedocs.io>`_. 
+   Visit `EBRAINS <https://ebrains.eu/service/quint/>`_ for more information about QUINT. Find full `user documentation here <https://quint-workflow.readthedocs.io>`_. 
    
 .. image:: a2e4586e8dc145d5bfdcaec7c21ac926/media/image6.png
       :width: 6.30139in
