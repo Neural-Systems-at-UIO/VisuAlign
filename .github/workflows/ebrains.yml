@@ -11,7 +11,7 @@ jobs:
       - name: sync_master
         uses: wei/git-sync@v3
         with:
-          source_repo: "HumanBrainProject/VisuAlign"
+          source_repo: "Neural-Systems-at-UIO/VisuAlign"
           source_branch: "master"
           destination_repo: "https://ghpusher:${{ secrets.EBRAINS_GITLAB }}@gitlab.ebrains.eu/csucs/visualign.git"
           destination_branch: "master"
