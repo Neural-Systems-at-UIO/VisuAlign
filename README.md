@@ -11,11 +11,11 @@ VisuAlign was developed with support from the EBRAINS infrastructure, and fundin
 # Documentation
 https://visualign.readthedocs.io
 
-# Developper
+# Developer
 Gergely Csucs
 
 # Authors
- Maja A Puchades, Jan G Bjaalie. 
+ Maja A Puchades, Sharon Yates, Jan G Bjaalie. 
 
 # Licence
 - Main component: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
