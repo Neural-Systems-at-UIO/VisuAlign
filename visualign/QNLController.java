@@ -1,5 +1,6 @@
 package visualign;
 
+import java.awt.Desktop;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -9,6 +10,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +35,9 @@ import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
@@ -51,7 +56,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -216,29 +223,50 @@ public class QNLController implements ChangeListener<Number> {
         
         List<ArrayList<Double>> markers=slice.markers;
         List<Triangle> triangles=slice.triangles;
+        
+        int key=event.getCharacter().codePointAt(0);
 
         updatePick();
-        if (event.getCharacter().codePointAt(0) == 8 || event.getCharacter().codePointAt(0) == 127) {
-//            updatePick();
-            if (pick >= 0) {
-                markers.remove(pick);
-            }
-        } else {
-            if (pick >= 0) return;
-            double mx = (mouseX - imgx) * slice.width / imgw;
-            double my = (mouseY - imgy) * slice.height / imgh;
-//            boolean found = false;
-            for (int i = 0; i < triangles.size(); i++) {
-                double xy[] = triangles.get(i).transform(mx, my);
-                if (xy != null) {
-                    markers.add(marker(xy[0], xy[1], mx, my));
-//                    found = true;
-                    break;
+        switch(key) {
+            case 32:
+                if (pick >= 0) return;
+                double mx = (mouseX - imgx) * slice.width / imgw;
+                double my = (mouseY - imgy) * slice.height / imgh;
+                for (int i = 0; i < triangles.size(); i++) {
+                    double xy[] = triangles.get(i).transform(mx, my);
+                    if (xy != null) {
+                        markers.add(marker(xy[0], xy[1], mx, my));
+                        break;
+                    }
                 }
-            }
-//            if (!found)
-//                throw new RuntimeException();
+                break;
+            case 8:
+            case 127:
+                if (pick >= 0)
+                    markers.remove(pick);
+                break;
         }
+//        if (event.getCharacter().codePointAt(0) == 8 || event.getCharacter().codePointAt(0) == 127) {
+////            updatePick();
+//            if (pick >= 0) {
+//                markers.remove(pick);
+//            }
+//        } else {
+//            if (pick >= 0) return;
+//            double mx = (mouseX - imgx) * slice.width / imgw;
+//            double my = (mouseY - imgy) * slice.height / imgh;
+////            boolean found = false;
+//            for (int i = 0; i < triangles.size(); i++) {
+//                double xy[] = triangles.get(i).transform(mx, my);
+//                if (xy != null) {
+//                    markers.add(marker(xy[0], xy[1], mx, my));
+////                    found = true;
+//                    break;
+//                }
+//            }
+////            if (!found)
+////                throw new RuntimeException();
+//        }
         slice.triangulate();
         reDraw();
     }
@@ -455,6 +483,7 @@ public class QNLController implements ChangeListener<Number> {
 
     String current;
     Palette palette;
+    Palette rainbow;
     Int32Slices slicer;
     Path baseFolder;
     String filename;
@@ -500,7 +529,8 @@ public class QNLController implements ChangeListener<Number> {
             }
             if(current==null || !current.equals(series.target)) {
                 current=series.target;
-                palette=ITKLabel.parseLabels(current+File.separator+"labels.txt");
+                palette=ITKLabel.parseLabels(current+File.separator+"labels.txt",false);
+                rainbow=ITKLabel.parseLabels(current+File.separator+"labels.txt",true);
                 slicer=new Int32Slices(current+File.separator+"labels.nii.gz");
             }
             if(series.resolution.size()==0) {
@@ -511,7 +541,7 @@ public class QNLController implements ChangeListener<Number> {
             spnVal.setMin(1);
             spnVal.setMax(series.slices.size());
             spnVal.setValue(spnVal.getMax()/2);
-//            loadView();
+            loadView();
         }
     }
     
@@ -529,7 +559,11 @@ public class QNLController implements ChangeListener<Number> {
         for(int y=0;y<x_overlay.length;y++) {
             int l[]=x_overlay[y];
             for(int x=0;x<l.length;x++)
+                try {
                 fastoverlay[x+y*l.length]=palette.fullmap.get(l[x]).remap;
+                } catch(Exception ex) {
+                    System.out.println(l[x]);
+                }
         }
         reDraw();
     }
@@ -560,7 +594,8 @@ public class QNLController implements ChangeListener<Number> {
                 pw.println("snr\tname\tsegmented\tchanged\tstable%");
             for(int i=0;i<slices.size();i++) {
                 Slice slice=slices.get(i);
-                if(slice.markers.size()>0) {
+//                if(slice.markers.size()>0) {
+                if(slice.markers.size()>=0) { //!! export-all hack
                     count++;
                     String name=slice.filename.substring(0, slice.filename.lastIndexOf('.'));
                     Double ouv[]=slice.anchoring.toArray(new Double[0]);
@@ -570,6 +605,7 @@ public class QNLController implements ChangeListener<Number> {
                     int h=overlay.length;
                     int w=overlay[0].length;
                     byte rgb[]=new byte[w*h*3];
+                    byte rbw[]=new byte[w*h*3];
                     int segmented=0;
                     int changed=0;
                     try(DataOutputStream dos=new DataOutputStream(new BufferedOutputStream(new FileOutputStream(f+File.separator+name+"_nl.flat")))){
@@ -581,6 +617,7 @@ public class QNLController implements ChangeListener<Number> {
                             for(int x=0;x<w;x++) {
 //                                SegLabel c=palette.fullmap.get(overlay[y][x]);
                                 SegLabel c=palette.fullmap.get(0);
+                                SegLabel cc=palette.fullmap.get(0);
                                 double fx = x * slice.width / w;
                                 double fy = y * slice.height / h;
                                 for (int j = 0; j < triangles.size(); j++) {
@@ -588,14 +625,19 @@ public class QNLController implements ChangeListener<Number> {
                                     if (t != null) {
                                         int xx = (int) (t[0] * w / slice.width);
                                         int yy = (int) (t[1] * h / slice.height);
-                                        if(xx>=0 && yy>=0 && xx<overlay[0].length && yy<overlay.length)
+                                        if(xx>=0 && yy>=0 && xx<overlay[0].length && yy<overlay.length) {
                                             c=palette.fullmap.get(overlay[yy][xx]);//!!
+                                            cc=rainbow.fullmap.get(overlay[yy][xx]);
+                                        }
                                         break;
                                     }
                                 }
                                 rgb[(x+y*w)*3]=(byte)c.red;
                                 rgb[(x+y*w)*3+1]=(byte)c.green;
                                 rgb[(x+y*w)*3+2]=(byte)c.blue;
+                                rbw[(x+y*w)*3]=(byte)cc.red;
+                                rbw[(x+y*w)*3+1]=(byte)cc.green;
+                                rbw[(x+y*w)*3+2]=(byte)cc.blue;
                                 if(byt)
                                     dos.writeByte(c.remap);
                                 else
@@ -613,6 +655,9 @@ public class QNLController implements ChangeListener<Number> {
                     BufferedImage bi=new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
                     bi.getRaster().setDataElements(0, 0, w, h, rgb);
                     ImageIO.write(bi, "png", new File(f+File.separator+name+"_nl.png"));
+                    /*BufferedImage*/ bi=new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+                    bi.getRaster().setDataElements(0, 0, w, h, rbw);
+                    ImageIO.write(bi, "png", new File(f+File.separator+name+"_nl_rbw.png"));
                 }
             }
             }
@@ -623,6 +668,7 @@ public class QNLController implements ChangeListener<Number> {
 
     @FXML
     void saveas(ActionEvent event) throws IOException {
+        if(series==null)return;
         FileChooser fc = new FileChooser();
         fc.setInitialDirectory(baseFolder.toFile());
         fc.setTitle("Pick JSON file");
@@ -721,16 +767,116 @@ public class QNLController implements ChangeListener<Number> {
             }
         });
     }
-    
+
     @FXML
     void about(ActionEvent event) {
-        String text=title+"\n\nVisuAlign is developed at the Neural Systems Laboratory, Institute of Basic Medical Sciences, University of Oslo (Norway), with funding from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Framework Partnership Agreement No. 650003 (HBP FPA).";
-        new Alert(AlertType.NONE, text, ButtonType.CLOSE).showAndWait();
+        Text t1=new Text("VisuAlign is developed at the Neural Systems Laboratory, Institute of Basic Medical Sciences, University of Oslo (Norway), with funding from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Framework Partnership Agreement No. 650003 (HBP FPA).");
+        Text t2=new Text("\n\nCitation:");
+        t2.setStyle("-fx-font-weight: bold");
+        Text t3=new Text("\nSee references page on");
+        Hyperlink t4=new Hyperlink("NITRC");
+        t4.setOnAction(e->{
+            try {
+                Desktop.getDesktop().browse(new URI("https://www.nitrc.org/plugins/mwiki/index.php/visualign:References"));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        });
+        Text t5=new Text("\n\nContact:");
+        Hyperlink t6=new Hyperlink("j.g.bjaalie@medisin.uio.no");
+        t6.setOnAction(e->{
+            try {
+                Desktop.getDesktop().browse(new URI("mailto:j.g.bjaalie@medisin.uio.no"));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        });
+        Text t7=new Text("\n\nWaxholm Space atlas of the Sprague Dawley Rat brain");
+        t7.setStyle("-fx-font-weight: bold");
+        Text t8=new Text("\n\nWaxholm Space Atlas of the Sprague Dawley Rat brain, v2.0 (Papp et al., Neuroimage 97: 374–386, 2014; Kjonigsen et al., Neuroimage 108:441-9, 2015).\n" + 
+                "See more at");
+        Hyperlink t9=new Hyperlink("NITRC");
+        t9.setOnAction(e->{
+            try {
+                Desktop.getDesktop().browse(new URI("https://www.nitrc.org/projects/whs-sd-atlas"));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        });
+        Text t10=new Text("\n\nAllen Mouse Brain Atlas reference atlas version 3 (2015, 2017)");
+        t10.setStyle("-fx-font-weight: bold");
+        Text t11=new Text("\n\nAllen Institute Mouse Brain Atlas, v3.0 (Lein et al., Nature 445:168-76, 2007; Oh et al., Nature 508:207-14, 2015; Technical white paper: Allen mouse common coordinate framework, May 2015 v.1).\n" + 
+                "See more at");
+        Hyperlink t12=new Hyperlink("Allen Mouse Brain Atlas");
+        t12.setOnAction(e->{
+            try {
+                Desktop.getDesktop().browse(new URI("http://mouse.brain-map.org/"));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        });
+        Text t13=new Text("\n\n\n\n\nCreated by Gergely Csucs, NeSys\n© 2018-2019, University of Oslo");
+        
+        TextFlow tf=new TextFlow(t1,t2,t3,t4,t5,t6,t10,t11,t12,t7,t8,t9,t13);
+        
+        Dialog<Void> dlg=new Dialog<>();
+        dlg.setResizable(true);
+        dlg.setTitle(title);
+        DialogPane pane=dlg.getDialogPane();
+        pane.setPrefWidth(700);
+        pane.setContent(tf);
+        pane.getButtonTypes().add(ButtonType.OK);
+        dlg.showAndWait();
+    }
+    
+    @FXML
+    void minidoc(ActionEvent event) {
+        Text t1=new Text("VisuAlign refines an existing alignment. For creating one, please refer to");
+        Hyperlink t2=new Hyperlink("QuickNII");
+        t2.setOnAction(e->{
+            try {
+                Desktop.getDesktop().browse(new URI("https://www.nitrc.org/projects/quicknii/"));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        });
+        Text t3=new Text("and articles/documentation related to it. Example datasets with \"before-after\" image pairs are provided at");
+        Hyperlink t4=new Hyperlink("NITRC");
+        t4.setOnAction(e->{
+            try {
+                Desktop.getDesktop().browse(new URI("https://www.nitrc.org/frs/?group_id=1426"));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        });
+        Text t5=new Text(", in both examples section #1 shows image as registered with QuickNII and section #2 shows the result after nonlinear refinements.\n\n");
+        Text t6=new Text("Controls:\n");
+        Text t7=new Text("\n- Space bar: place marker\n" + 
+                "- Backspace, Delete: remove marker under mouse cursor\n" + 
+                "- Left arrow: navigate to previous section\n" + 
+                "- Right arrow: navigate to next section\n" +
+                "Drag the crosses with the mouse in order to apply nonlinear adjustments.\n");
+        Text t8=new Text("\nMiscellaneous:\n");
+        Text t9=new Text("\n" +
+                "- Pull Opacity slider to the maximum (far right) in order to toggle outline mode. Only in outline mode the control for changing outline color becomes active\n" + 
+                "- View/Debug mode shows the triangulation used for nonlinear adjustments (and the control for changing triangle color becomes active). This mode also shows the active region where markers can be placed. The region is 10% larger than the image in every direction, and will contain overlay data in the future\n" + 
+                "- File/Close and Edit/Clear section will always ask for confirmation, regardless of having unsaved modifications");
+        
+        TextFlow tf=new TextFlow(t1,t2,t3,t4,t5,t6,t7,t8,t9);
+        
+        Dialog<Void> dlg=new Dialog<>();
+        dlg.setResizable(true);
+        dlg.setTitle(title);
+        DialogPane pane=dlg.getDialogPane();
+        pane.setPrefWidth(700);
+        pane.setContent(tf);
+        pane.getButtonTypes().add(ButtonType.OK);
+        dlg.showAndWait();
     }
     
     Stage stage;
     public void setTitle(String filename) {
-        stage.setTitle(filename==null?title:(title+": "+filename));
+        stage.setTitle(filename==null?title:(title+": "+filename+" (registered to "+(series.target.replaceAll("_", " ").replace(".cutlas", ""))+")"));
     }
     public static final String version="v0.8";
     public static final String title="VisuAlign - NonLinear "+version;

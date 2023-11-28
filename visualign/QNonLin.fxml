@@ -45,6 +45,7 @@
             </Menu>
           <Menu text="Help">
             <items>
+              <MenuItem onAction="#minidoc" text="Quick reference" />
               <MenuItem onAction="#about" text="About" />
             </items>
           </Menu>
