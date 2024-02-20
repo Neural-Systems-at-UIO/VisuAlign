@@ -13,5 +13,5 @@ jobs:
         with:
           source_repo: "Neural-Systems-at-UIO/VisuAlign"
           source_branch: "master"
-          destination_repo: "https://ghpusher:${{ secrets.EBRAINS_GITLAB }}@gitlab.ebrains.eu/csucs/visualign.git"
+          destination_repo: "https://ghpusher:${{ secrets.EBRAINS_GITLAB }}@gitlab.ebrains.eu/ri/tech-hub/apps/nesys/visualign.git"
           destination_branch: "master"
