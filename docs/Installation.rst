@@ -19,13 +19,13 @@ VisuAlign keeps track of original image dimensions as part of its series descrip
 
 **Technical information**
 
-comming soon..
+Coming soon..
 
 **Download:**
 
 Link: https://www.nitrc.org/projects/visualign 
 
-Unzipp the VisuAlign folder at your desired location.
+Unzip the VisuAlign folder at your desired location.
 
 **Conditions of use**
 ~~~~~~~~~~~~~~~~~~~~~~
