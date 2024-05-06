@@ -5,8 +5,7 @@
 VisuAlign uses files generated for and by QuickNII. VisuAlign
 therefore has the same image requirements as QuickNII:
 
-Standard web-compatible image formats are supported, 24-bit PNG and JPEG. 
-  Images can be loaded up to the resolution of 16 megapixels (e.g.
+Standard web-compatible image formats are supported, 24-bit PNG and JPEG. Images can be loaded up to the resolution of 16 megapixels (e.g.
   4000x4000 or 5000x3000 pixels). However, just like QuickNII, VisuAlign does not benefit from image resolutions exceeding
   the resolution of the monitor in use. For a standard FullHD or WUXGA
   display (1920x1080 or 1920x1200 pixels) the useful image area is
