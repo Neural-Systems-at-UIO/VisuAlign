@@ -92,9 +92,9 @@ If your work makes use of previous atlas versions, or brain region descriptions 
 **Release notes**
 ~~~~~~~~~~~~~~~~~~
 
-*Version 0.9 (2021-10-11) 
+* Version 0.9 (2021-10-11) 
 
-*Version 0.8 (2020-01-23) First stable version
+* Version 0.8 (2020-01-23) First stable version
 
 
 
