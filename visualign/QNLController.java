@@ -10,10 +10,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,15 +31,18 @@ import data.Slice;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
@@ -210,66 +215,80 @@ public class QNLController implements ChangeListener<Number> {
 //    List<Marker> markers = new ArrayList<Marker>();
     @FXML
     void keyPressed(KeyEvent event) {
-        KeyCode kc=event.getCode();
-        if(kc==KeyCode.LEFT)
-            spnVal.decrement(1);
-        if(kc==KeyCode.RIGHT)
-            spnVal.increment(1);
-    }
-
-    @FXML
-    void keyTyped(KeyEvent event) {
         if(slice==null)return;
+//    	new Alert(AlertType.INFORMATION,String.format("%08x", new BigInteger(1,event.getCharacter().getBytes()))+" "+event.getCode()).showAndWait();
         
+        KeyCode kc=event.getCode();
+        if(kc==KeyCode.LEFT) {
+            spnVal.decrement(1);
+            return;
+        }
+        if(kc==KeyCode.RIGHT) {
+            spnVal.increment(1);
+            return;
+        }
+
         List<ArrayList<Double>> markers=slice.markers;
         List<Triangle> triangles=slice.triangles;
-        
-        int key=event.getCharacter().codePointAt(0);
-
         updatePick();
-        switch(key) {
-            case 32:
-                if (pick >= 0) return;
-                double mx = (mouseX - imgx) * slice.width / imgw;
-                double my = (mouseY - imgy) * slice.height / imgh;
-                for (int i = 0; i < triangles.size(); i++) {
-                    double xy[] = triangles.get(i).transform(mx, my);
-                    if (xy != null) {
-                        markers.add(marker(xy[0], xy[1], mx, my));
-                        break;
-                    }
-                }
-                break;
-            case 8:
-            case 127:
+        switch(kc) {
+	        case SPACE:
+	            if (pick >= 0) return;
+	            double mx = (mouseX - imgx) * slice.width / imgw;
+	            double my = (mouseY - imgy) * slice.height / imgh;
+	            for (int i = 0; i < triangles.size(); i++) {
+	                double xy[] = triangles.get(i).transform(mx, my);
+	                if (xy != null) {
+	                    markers.add(marker(xy[0], xy[1], mx, my));
+	                    break;
+	                }
+	            }
+	            break;
+	        case DELETE:
+	        case BACK_SPACE:
                 if (pick >= 0)
                     markers.remove(pick);
                 break;
+            default:
+            	return;
         }
-//        if (event.getCharacter().codePointAt(0) == 8 || event.getCharacter().codePointAt(0) == 127) {
-////            updatePick();
-//            if (pick >= 0) {
-//                markers.remove(pick);
-//            }
-//        } else {
-//            if (pick >= 0) return;
-//            double mx = (mouseX - imgx) * slice.width / imgw;
-//            double my = (mouseY - imgy) * slice.height / imgh;
-////            boolean found = false;
-//            for (int i = 0; i < triangles.size(); i++) {
-//                double xy[] = triangles.get(i).transform(mx, my);
-//                if (xy != null) {
-//                    markers.add(marker(xy[0], xy[1], mx, my));
-////                    found = true;
-//                    break;
-//                }
-//            }
-////            if (!found)
-////                throw new RuntimeException();
-//        }
         slice.triangulate();
         reDraw();
     }
+
+//    @FXML
+//    void keyTyped(KeyEvent event) {
+//        
+//        
+//        int key=event.getCharacter().codePointAt(0);
+//
+//        switch(key) {
+//            case 32:
+//            case 8:
+//            case 127:
+//        }
+////        if (event.getCharacter().codePointAt(0) == 8 || event.getCharacter().codePointAt(0) == 127) {
+//////            updatePick();
+////            if (pick >= 0) {
+////                markers.remove(pick);
+////            }
+////        } else {
+////            if (pick >= 0) return;
+////            double mx = (mouseX - imgx) * slice.width / imgw;
+////            double my = (mouseY - imgy) * slice.height / imgh;
+//////            boolean found = false;
+////            for (int i = 0; i < triangles.size(); i++) {
+////                double xy[] = triangles.get(i).transform(mx, my);
+////                if (xy != null) {
+////                    markers.add(marker(xy[0], xy[1], mx, my));
+//////                    found = true;
+////                    break;
+////                }
+////            }
+//////            if (!found)
+//////                throw new RuntimeException();
+////        }
+//    }
 
     @FXML
     void initialize() throws Exception {
@@ -511,28 +530,33 @@ public class QNLController implements ChangeListener<Number> {
                 Map<String, String> resolver = new HashMap<>();
                 resolver.put("resolution", "target-resolution");
                 JSON.mapObject(JSON.parse(fr), series, resolver);
-            }
+            } catch (Exception ex) {}
             if(series.slices.size()<1) {
                 series=null;
-                Alert a=new Alert(AlertType.ERROR, "This JSON file was not generated by QuickNII.", ButtonType.OK);
+                Alert a=new Alert(AlertType.ERROR, f.getName()+" is not compatible with VisuAlign.", ButtonType.OK);
                 a.showAndWait();
                 return;
             }
             series.propagate();
             if(series.target==null) {
-                DirectoryChooser dc=new DirectoryChooser();
-                dc.setTitle("Old series data, please select an atlas folder from QNonLin");
-                dc.setInitialDirectory(new File(System.getProperty("java.home")));
-                File d=dc.showDialog(stage);
-                if(d==null)return;
-                series.target=d.getName();
+            	if(!pickAtlas(true)) {
+            		series=null;
+            		return;
+            	}
+//                DirectoryChooser dc=new DirectoryChooser();
+//                dc.setTitle("Old series data, please select an atlas folder from VisuAlign");
+//                dc.setInitialDirectory(new File(System.getProperty("java.home")));
+//                File d=dc.showDialog(stage);
+//                if(d==null)return;
+//                series.target=d.getName();
             }
-            if(current==null || !current.equals(series.target)) {
-                current=series.target;
-                palette=ITKLabel.parseLabels(current+File.separator+"labels.txt",false);
-                rainbow=ITKLabel.parseLabels(current+File.separator+"labels.txt",true);
-                slicer=new Int32Slices(current+File.separator+"labels.nii.gz");
-            }
+            loadAtlas();
+//            if(current==null || !current.equals(series.target)) {
+//                current=series.target;
+//                palette=ITKLabel.parseLabels(current+File.separator+"labels.txt",false);
+//                rainbow=ITKLabel.parseLabels(current+File.separator+"labels.txt",true);
+//                slicer=new Int32Slices(current+File.separator+"labels.nii.gz");
+//            }
             if(series.resolution.size()==0) {
                 series.resolution.add((double)slicer.XDIM);
                 series.resolution.add((double)slicer.YDIM);
@@ -543,6 +567,27 @@ public class QNLController implements ChangeListener<Number> {
             spnVal.setValue(spnVal.getMax()/2);
             loadView();
         }
+    }
+    
+    void loadAtlas() throws Exception {
+        if(current==null || !current.equals(series.target)) {
+            current=series.target;
+            palette=ITKLabel.parseLabels(current+File.separator+"labels.txt",false);
+            rainbow=ITKLabel.parseLabels(current+File.separator+"labels.txt",true);
+            slicer=new Int32Slices(current+File.separator+"labels.nii.gz");
+            atlas.setText(series.target.replaceAll("_", " ").replace(".cutlas", ""));
+        }
+    }
+    
+    boolean pickAtlas(boolean change) {
+        DirectoryChooser dc=new DirectoryChooser();
+        dc.setTitle(change?"Atlas folder selection":"Old series data, please select an atlas folder from VisuAlign");
+        dc.setInitialDirectory(new File(System.getProperty("java.home")));
+        File d=dc.showDialog(stage);
+        if(d==null)
+        	return false;
+        series.target=d.getName();
+    	return true;
     }
     
     void loadView() {
@@ -587,12 +632,20 @@ public class QNLController implements ChangeListener<Number> {
         dc.setTitle("Pick folder for exporting slices");
         File f=dc.showDialog(stage);
         if(f!=null) {
+        	var a=new Alert(AlertType.INFORMATION);
+        	a.setTitle("Please wait");
+        	a.setHeaderText("Exporting atlas maps");
+        	a.show();
+        	var task=new Task<Void>() {
+				@Override
+				protected Void call() throws Exception {
             List<Slice> slices=series.slices;
             int count=0;
             try(PrintWriter pw=new PrintWriter(f+File.separator+"report.tsv")){
 //                pw.println("snr\tname\twidth\theight\ttotal\tsegmented\tcoverage%\tchanged\tchanged%");
                 pw.println("snr\tname\tsegmented\tchanged\tstable%");
             for(int i=0;i<slices.size();i++) {
+            	updateMessage(i+"/"+slices.size());
                 Slice slice=slices.get(i);
 //                if(slice.markers.size()>0) {
                 if(slice.markers.size()>=0) { //!! export-all hack
@@ -661,8 +714,19 @@ public class QNLController implements ChangeListener<Number> {
                 }
             }
             }
-            Alert a=new Alert(AlertType.INFORMATION, "Done. "+(count==0?"No":count)+" non-linear segmentation"+(count!=1?"s":"")+" exported.");
-            a.showAndWait();
+					return null;
+				}
+			};
+			task.setOnSucceeded(evnt->Platform.exitNestedEventLoop(task, null));
+			a.contentTextProperty().bind(task.messageProperty());
+			new Thread(task).start();
+			Platform.enterNestedEventLoop(task);
+	        a.close();
+			
+
+//            Alert a=new Alert(AlertType.INFORMATION, "Done. "+(count==0?"No":count)+" non-linear segmentation"+(count!=1?"s":"")+" exported.");
+//            Alert a=new Alert(AlertType.INFORMATION, "Done. "+count+" segmentation"+(count!=1?"s":"")+" exported.");
+//            a.showAndWait();
         }
     }
 
@@ -767,57 +831,78 @@ public class QNLController implements ChangeListener<Number> {
             }
         });
     }
+    
+    @FXML
+    private MenuItem atlas;
+    
+    @FXML
+    void pickAtlas(ActionEvent event) throws Exception {
+        if(series==null)return;
+        if(pickAtlas(true)) {
+        	loadAtlas();
+        	loadView();
+        }
+    }
+    
+    Hyperlink hyperlink(String text,String URL) {
+    	var h=new Hyperlink(text);
+        h.setStyle("-fx-translate-y: -0.5px");
+        h.setOnAction(e->{
+            try {
+                Desktop.getDesktop().browse(new URI(URL));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        });
+        return h;
+    }
+    Text text(String text) {
+    	return new Text(text);
+    }
+    Text bold(String text) {
+    	var t=new Text(text);
+        t.setStyle("-fx-font-weight: bold");
+        return t;
+    }
 
     @FXML
     void about(ActionEvent event) {
-        Text t1=new Text("VisuAlign is developed at the Neural Systems Laboratory, Institute of Basic Medical Sciences, University of Oslo (Norway), with funding from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Framework Partnership Agreement No. 650003 (HBP FPA).");
-        Text t2=new Text("\n\nCitation:");
-        t2.setStyle("-fx-font-weight: bold");
-        Text t3=new Text("\nSee references page on");
-        Hyperlink t4=new Hyperlink("NITRC");
-        t4.setOnAction(e->{
-            try {
-                Desktop.getDesktop().browse(new URI("https://www.nitrc.org/plugins/mwiki/index.php/visualign:References"));
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-        });
-        Text t5=new Text("\n\nContact:");
-        Hyperlink t6=new Hyperlink("j.g.bjaalie@medisin.uio.no");
-        t6.setOnAction(e->{
-            try {
-                Desktop.getDesktop().browse(new URI("mailto:j.g.bjaalie@medisin.uio.no"));
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-        });
-        Text t7=new Text("\n\nWaxholm Space atlas of the Sprague Dawley Rat brain");
-        t7.setStyle("-fx-font-weight: bold");
-        Text t8=new Text("\n\nWaxholm Space Atlas of the Sprague Dawley Rat brain, v2.0 (Papp et al., Neuroimage 97: 374–386, 2014; Kjonigsen et al., Neuroimage 108:441-9, 2015).\n" + 
-                "See more at");
-        Hyperlink t9=new Hyperlink("NITRC");
-        t9.setOnAction(e->{
-            try {
-                Desktop.getDesktop().browse(new URI("https://www.nitrc.org/projects/whs-sd-atlas"));
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-        });
-        Text t10=new Text("\n\nAllen Mouse Brain Atlas reference atlas version 3 (2015, 2017)");
-        t10.setStyle("-fx-font-weight: bold");
-        Text t11=new Text("\n\nAllen Institute Mouse Brain Atlas, v3.0 (Lein et al., Nature 445:168-76, 2007; Oh et al., Nature 508:207-14, 2015; Technical white paper: Allen mouse common coordinate framework, May 2015 v.1).\n" + 
-                "See more at");
-        Hyperlink t12=new Hyperlink("Allen Mouse Brain Atlas");
-        t12.setOnAction(e->{
-            try {
-                Desktop.getDesktop().browse(new URI("http://mouse.brain-map.org/"));
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-        });
-        Text t13=new Text("\n\n\n\n\nCreated by Gergely Csucs, NeSys\n© 2018-2019, University of Oslo");
-        
-        TextFlow tf=new TextFlow(t1,t2,t3,t4,t5,t6,t10,t11,t12,t7,t8,t9,t13);
+    	var tf=new TextFlow(
+    			text("VisuAlign is developed at the Neural Systems Laboratory, Institute of Basic Medical Sciences, University of Oslo (Norway), with funding from the European Unionï¿½s Horizon 2020 Framework Programme for Research and Innovation under the Framework Partnership Agreement No. 650003 (HBP FPA).\n\n"),
+				bold("License:"),text(" MIT license. Source code is available on"),
+				hyperlink("GitHub","https://github.com/HumanBrainProject/VisuAlign"),
+				text("\n\n"),
+				bold("Citation\n"),
+				text("- RRID on"),
+				hyperlink("SciCrunch","https://scicrunch.org/resolver/RRID:SCR_017978"),
+				text("(VisuAlign, RRID:SCR_017978)\n"),
+				text("- Puchades MA, Csucs G, Ledergerber D, Leergaard TB, Bjaalie JG (2019) Spatial registration of serial microscopic brain images to three-dimensional reference atlases with the QuickNII tool. PLoS ONE 14(5): e0216796."),
+				hyperlink("https://doi.org/10.1371/journal.pone.0216796", "https://doi.org/10.1371/journal.pone.0216796"),
+				text("\nSee possible updates on"),
+				hyperlink("NITRC","https://www.nitrc.org/plugins/mwiki/index.php/visualign:References"),
+				text("\n\n"),
+				bold("User documentation:"),
+				hyperlink("https://visualign.readthedocs.io/","https://visualign.readthedocs.io/"),
+				text("\n"),
+				bold("User support:"),
+				hyperlink("https://ebrains.eu/support","https://ebrains.eu/support"),
+				text("\n"),
+				bold("Contact:"),
+				hyperlink("j.g.bjaalie@medisin.uio.no","mailto:j.g.bjaalie@medisin.uio.no"),
+				text("\n\n"),
+				bold("Waxholm Space atlas of the Sprague Dawley Rat brain"),
+				text("\n\n"),
+				text("Waxholm Space Atlas of the Sprague Dawley Rat brain, v2, v3, v4 (RRID: SCR_017124; Papp et al., NeuroImage 97, 374-386, 2014; Papp et al., NeuroImage 105, 561ï¿½562, 2015; Kjonigsen et al., NeuroImage 108, 441-449, 2015; Osen et al., NeuroImage 199, 38-56, 2019; Kleven et al., in preparation)\n"),
+				text("See more on"),
+				hyperlink("NITRC","https://www.nitrc.org/projects/whs-sd-atlas"),
+				text("\n\n"),
+				bold("Allen Mouse Brain Atlas reference atlas version 3 (2015, 2017)"),
+				text("\n\n"),
+				text("Allen Institute Mouse Brain Atlas, v3.0 (Lein et al., Nature 445:168-76, 2007; Oh et al., Nature 508:207-14, 2015; Technical white paper: Allen mouse common coordinate framework, May 2015 v.1)\n"),
+				text("See more on"),
+				hyperlink("Allen Mouse Brain Atlas","http://mouse.brain-map.org/"),
+				text("\n\n\nCreated by Gergely Csucs, NeSys\nï¿½ 2018-2021, University of Oslo")
+    	);
         
         Dialog<Void> dlg=new Dialog<>();
         dlg.setResizable(true);
@@ -878,6 +963,6 @@ public class QNLController implements ChangeListener<Number> {
     public void setTitle(String filename) {
         stage.setTitle(filename==null?title:(title+": "+filename+" (registered to "+(series.target.replaceAll("_", " ").replace(".cutlas", ""))+")"));
     }
-    public static final String version="v0.8";
+    public static final String version="v0.9";
     public static final String title="VisuAlign - NonLinear "+version;
 }

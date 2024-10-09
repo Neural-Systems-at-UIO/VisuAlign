@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="vbox" minHeight="600.0" minWidth="1024.0" onKeyPressed="#keyPressed" onKeyTyped="#keyTyped" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="visualign.QNLController">
+<VBox fx:id="vbox" minHeight="600.0" minWidth="1024.0" onKeyPressed="#keyPressed" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="visualign.QNLController">
    <children>
       <MenuBar>
         <menus>
@@ -36,13 +36,14 @@
           <Menu text="Edit">
             <items>
               <MenuItem onAction="#clear" text="Clear section" />
+              <MenuItem fx:id="atlas" onAction="#pickAtlas" text="&lt;atlas&gt;" />
             </items>
           </Menu>
-            <Menu text="View">
-               <items>
-                  <RadioMenuItem fx:id="debug" onAction="#debug" text="Debug" />
-               </items>
-            </Menu>
+          <Menu text="View">
+            <items>
+              <RadioMenuItem fx:id="debug" onAction="#debug" text="Debug" />
+            </items>
+          </Menu>
           <Menu text="Help">
             <items>
               <MenuItem onAction="#minidoc" text="Quick reference" />
