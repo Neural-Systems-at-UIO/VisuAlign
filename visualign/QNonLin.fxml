@@ -41,6 +41,7 @@
           </Menu>
           <Menu text="View">
             <items>
+              <RadioMenuItem fx:id="hidepins" onAction="#hidepins" text="Hide Markers" />
               <RadioMenuItem fx:id="debug" onAction="#debug" text="Debug" />
             </items>
           </Menu>

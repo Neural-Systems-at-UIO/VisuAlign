@@ -12,8 +12,8 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import nii.Nifti1Dataset;
+import visualign.ProgressPop;
 
 public class Int32Slices {
     //public final boolean bigendian;
@@ -63,11 +63,20 @@ public class Int32Slices {
         	if(n1d.big_endian || n1d.getDatatype()!=Nifti1Dataset.NIFTI_TYPE_UINT32)
         		throw new Exception("?!");
         	blob=null;
+        	try {
         	blob10=new int[ZDIM][YDIM][XDIM];
-        	var a=new Alert(AlertType.INFORMATION, aNiftiFile);
-        	a.setTitle("Please wait");
-        	a.setHeaderText("Loading high-resolution atlas, this will take some time");
-        	a.show();
+        	} catch(OutOfMemoryError oom ) {
+        		var alert=new Alert(AlertType.ERROR, aNiftiFile);
+        		alert.setTitle("Out of memory");
+        		alert.setHeaderText("There's not enough free memory to load high-resolution atlas.");
+        		alert.showAndWait();
+        		throw oom;
+        	}
+        	var p=new ProgressPop("Loading high-resolution atlas, this will take some time");
+//        	var a=new Alert(AlertType.INFORMATION, aNiftiFile);
+//        	a.setTitle("Please wait");
+//        	a.setHeaderText("Loading high-resolution atlas, this will take some time");
+//        	a.show();
         	var task=new Task<Void>() {
 				@Override
 				protected Void call() throws Exception {
@@ -77,7 +86,8 @@ public class Int32Slices {
 			        	dis.skipNBytes(352);
 			            for(int z=0;z<ZDIM;z++) {
 			            	//System.out.println(ZDIM-z);
-			            	updateMessage(z+"/"+ZDIM);
+//			            	updateMessage(z+"/"+ZDIM);
+			            	updateProgress(z, ZDIM);
 			            	for(int y=0;y<YDIM;y++)
 			            		for(int x=0;x<XDIM;x++)
 			            			blob10[z][y][x]=dis.readInt();
@@ -87,10 +97,12 @@ public class Int32Slices {
 				}
 			};
 			task.setOnSucceeded(event->Platform.exitNestedEventLoop(aNiftiFile, null));
-			a.contentTextProperty().bind(task.messageProperty());
+			p.bindTask(task);
+//			a.contentTextProperty().bind(task.messageProperty());
 			new Thread(task).start();
 			Platform.enterNestedEventLoop(aNiftiFile);
-	        a.close();
+			p.close();
+//	        a.close();
         } else {
         	blob10=null;
 	        byte bytes[]=new byte[XDIM*YDIM*ZDIM*BPV];

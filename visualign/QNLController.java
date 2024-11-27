@@ -104,6 +104,9 @@ public class QNLController implements ChangeListener<Number> {
 
     @FXML
     private RadioMenuItem debug;
+    
+    @FXML
+    private RadioMenuItem hidepins;
 
     @FXML
     private Spinner<Integer> spn;
@@ -122,10 +125,11 @@ public class QNLController implements ChangeListener<Number> {
     double picky;
 
     void updatePick() {
-        if(slice==null)return;
-        List<ArrayList<Double>> markers=slice.markers;
         pick = -1;
         picked = null;
+        if(slice==null)return;
+        if(hidepins.isSelected())return;
+        List<ArrayList<Double>> markers=slice.markers;
         pickx = (mouseX - imgx) * slice.width / imgw;
         picky = (mouseY - imgy) * slice.height / imgh;
         double margin = slice.width * 10 / imgw;
@@ -227,6 +231,27 @@ public class QNLController implements ChangeListener<Number> {
             spnVal.increment(1);
             return;
         }
+        
+        if(kc==KeyCode.PAGE_UP) {
+        	if(slice.layerindex<slice.filenames.size()-1) {
+        		slice.layerindex++;
+        		image=new Image("file:"+baseFolder.resolve(slice.filenames.get(slice.layerindex)));
+        		drawImage();
+        	}
+        	return;
+        }
+
+        if(kc==KeyCode.PAGE_DOWN) {
+        	if(slice.layerindex>0) {
+        		slice.layerindex--;
+        		image=new Image("file:"+baseFolder.resolve(slice.filenames.get(slice.layerindex)));
+        		drawImage();
+        	}
+        	return;
+        }
+        
+        if(hidepins.isSelected())
+        	return;
 
         List<ArrayList<Double>> markers=slice.markers;
         List<Triangle> triangles=slice.triangles;
@@ -455,6 +480,8 @@ public class QNLController implements ChangeListener<Number> {
     }
 
     private void drawPins() {
+    	if(hidepins.isSelected())
+    		return;
         GraphicsContext ctx = ovlycnv.getGraphicsContext2D();
         ctx.setStroke(pinColor.getValue());
         ctx.setLineWidth(3);
@@ -492,6 +519,11 @@ public class QNLController implements ChangeListener<Number> {
 
     @FXML
     void debug(ActionEvent event) {
+        reDraw();
+    }
+    
+    @FXML
+    void hidepins(ActionEvent event) {
         reDraw();
     }
     
@@ -594,7 +626,7 @@ public class QNLController implements ChangeListener<Number> {
         if(series==null)
             return; //!!
         slice=series.slices.get(spnVal.getValue()-1);
-        image=new Image("file:"+baseFolder.resolve(slice.filename));
+       	image=new Image("file:"+baseFolder.resolve(slice.filename!=null?slice.filename:slice.filenames.get(slice.layerindex)));
         setTitle(slice.filename);
         slice.triangulate();
         drawImage();

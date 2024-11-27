@@ -2,6 +2,7 @@ package data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import math.Estimator;
 import nonlin.Triangle;
@@ -10,6 +11,7 @@ import static data.Marker.marker;
 
 public class Slice implements Comparable<Slice> {
     public String filename;
+    public List<String> filenames = new ArrayList<>();
     public double nr;
     public double width;
     public double height;
@@ -17,9 +19,21 @@ public class Slice implements Comparable<Slice> {
     public List<ArrayList<Double>> markers = new ArrayList<>();
 
     public String toString() {
-        return "\n{\"filename\":\"" + filename + "\",\"nr\":" + (int) nr + ",\"width\":" + (int) width + ",\"height\":"
-                + (int) height + (noanchoring ? "" : ",\"anchoring\":" + anchoring)
-                + (markers.size() > 0 ? ",\"markers\":" + markers : "") + "}";
+		var line = "\n{";
+		if (filename != null)
+			line += String.format("\"filename\":\"%s\"", filename);
+		else
+			line += "\"filenames\":" + filenames.stream().collect(Collectors.joining("\",\"", "[\"", "\"]"));
+		line += String.format(",\"nr\":%d,\"width\":%d,\"height\":%d", (int) nr, (int) width, (int) height);
+		if (!noanchoring)
+			line += ",\"anchoring\":" + anchoring;
+		if (markers.size() > 0)
+			line += ",\"markers\":" + markers;
+		line += "}";
+		return line;
+//        return "\n{\"filename\":\"" + filename + "\",\"nr\":" + (int) nr + ",\"width\":" + (int) width + ",\"height\":"
+//                + (int) height + (noanchoring ? "" : ",\"anchoring\":" + anchoring)
+//                + (markers.size() > 0 ? ",\"markers\":" + markers : "") + "}";
     }
 
     public List<List<Double>> trimarkers;
@@ -143,4 +157,6 @@ public class Slice implements Comparable<Slice> {
         }
         return false;
     }
+    
+    public int layerindex = 0;
 }
