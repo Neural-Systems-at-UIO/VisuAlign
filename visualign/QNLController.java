@@ -682,7 +682,8 @@ public class QNLController implements ChangeListener<Number> {
 //                if(slice.markers.size()>0) {
                 if(slice.markers.size()>=0) { //!! export-all hack
                     count++;
-                    String name=slice.filename.substring(0, slice.filename.lastIndexOf('.'));
+                    String name=slice.filename!=null?slice.filename:slice.filenames.get(0);
+                    name=name.substring(0, name.lastIndexOf('.'));
                     Double ouv[]=slice.anchoring.toArray(new Double[0]);
                     int overlay[][]=slicer.getInt32Slice(ouv[0], ouv[1], ouv[2], ouv[3], ouv[4], ouv[5], ouv[6], ouv[7], ouv[8], false);
                     slice.triangulate();
@@ -735,7 +736,7 @@ public class QNLController implements ChangeListener<Number> {
 //                        pw.println((int)slice.nr+"\t"+slice.filename+"\t"+overlay[0].length+"\t"+overlay.length+"\t"+
 //                            overlay[0].length*overlay.length+"\t"+segmented+"\t"+segmented*100/overlay[0].length/overlay.length+"%\t"+
 //                            changed+"\t"+changed*100/segmented+"%");
-                        pw.println((int)slice.nr+"\t"+slice.filename+"\t"+segmented+"\t"+changed+"\t"+(segmented-changed)*100/segmented+"%");
+                        pw.println((int)slice.nr+"\t"+(slice.filename!=null?slice.filename:slice.filenames.get(0))+"\t"+segmented+"\t"+changed+"\t"+(segmented-changed)*100/segmented+"%");
                     }
                     BufferedImage bi=new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
                     bi.getRaster().setDataElements(0, 0, w, h, rgb);
