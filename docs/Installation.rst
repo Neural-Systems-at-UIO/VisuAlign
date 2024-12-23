@@ -1,5 +1,6 @@
-**Installation requirements**
+**Installation and citation**
 -----------------------------
+
 **System requirements**
 ~~~~~~~~~~~~~~~~~~~~~~~~
 VisuAlign uses files generated for and by QuickNII. VisuAlign
@@ -35,7 +36,7 @@ Creative Commons Attribution-NonCommercial-ShareAlike 4.0
 International for the main component. Source code: MIT License.
 
 
-**Citation of the tool:**
+**Citation of VisuAlign:**
 
 -RRID on SciCrunch: (VisuAlign, RRID:SCR_017978)
 
@@ -51,7 +52,7 @@ Basic Medical Sciences,University of Oslo (Norway), with funding from the Europe
 Horizon 2020 Framework Programme for Research and Innovation under the
 Framework Partnership Agreement No. 650003 (HBP FPA).
 
-**Citation of the atlases embedded in the tool:**
+**Citation of the atlases in VisuAlign:**
 
 VisuAlign can be used with the following reference atlases:
 
