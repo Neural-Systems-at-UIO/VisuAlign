@@ -672,16 +672,15 @@ public class QNLController implements ChangeListener<Number> {
 				@Override
 				protected Void call() throws Exception {
             List<Slice> slices=series.slices;
-            int count=0;
+//            int count=0;
             try(PrintWriter pw=new PrintWriter(f+File.separator+"report.tsv")){
 //                pw.println("snr\tname\twidth\theight\ttotal\tsegmented\tcoverage%\tchanged\tchanged%");
                 pw.println("snr\tname\tsegmented\tchanged\tstable%");
             for(int i=0;i<slices.size();i++) {
             	updateMessage(i+"/"+slices.size());
                 Slice slice=slices.get(i);
-//                if(slice.markers.size()>0) {
-                if(slice.markers.size()>=0) { //!! export-all hack
-                    count++;
+                if(slice.markers.size()>0) {
+//                    count++;
                     String name=slice.filename!=null?slice.filename:slice.filenames.get(0);
                     name=name.substring(0, name.lastIndexOf('.'));
                     Double ouv[]=slice.anchoring.toArray(new Double[0]);
@@ -736,6 +735,49 @@ public class QNLController implements ChangeListener<Number> {
 //                        pw.println((int)slice.nr+"\t"+slice.filename+"\t"+overlay[0].length+"\t"+overlay.length+"\t"+
 //                            overlay[0].length*overlay.length+"\t"+segmented+"\t"+segmented*100/overlay[0].length/overlay.length+"%\t"+
 //                            changed+"\t"+changed*100/segmented+"%");
+                        pw.println((int)slice.nr+"\t"+(slice.filename!=null?slice.filename:slice.filenames.get(0))+"\t"+segmented+"\t"+changed+"\t"+(segmented-changed)*100/segmented+"%");
+                    }
+                    BufferedImage bi=new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+                    bi.getRaster().setDataElements(0, 0, w, h, rgb);
+                    ImageIO.write(bi, "png", new File(f+File.separator+name+"_nl.png"));
+                    /*BufferedImage*/ bi=new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+                    bi.getRaster().setDataElements(0, 0, w, h, rbw);
+                    ImageIO.write(bi, "png", new File(f+File.separator+name+"_nl_rbw.png"));
+                } else {
+                    String name=slice.filename!=null?slice.filename:slice.filenames.get(0);
+                    name=name.substring(0, name.lastIndexOf('.'));
+                    Double ouv[]=slice.anchoring.toArray(new Double[0]);
+                    int overlay[][]=slicer.getInt32Slice(ouv[0], ouv[1], ouv[2], ouv[3], ouv[4], ouv[5], ouv[6], ouv[7], ouv[8], false);
+                    int h=overlay.length;
+                    int w=overlay[0].length;
+                    byte rgb[]=new byte[w*h*3];
+                    byte rbw[]=new byte[w*h*3];
+                    int segmented=0;
+                    int changed=0;
+                    try(DataOutputStream dos=new DataOutputStream(new BufferedOutputStream(new FileOutputStream(f+File.separator+name+"_nl.flat")))){
+                        boolean byt=palette.fastcolors.length<=256;
+                        dos.writeByte(byt?1:2);
+                        dos.writeInt(w);
+                        dos.writeInt(h);
+                        for(int y=0;y<h;y++)
+                            for(int x=0;x<w;x++) {
+                                SegLabel c=palette.fullmap.get(overlay[y][x]);
+                                SegLabel cc=rainbow.fullmap.get(overlay[y][x]);
+                                rgb[(x+y*w)*3]=(byte)c.red;
+                                rgb[(x+y*w)*3+1]=(byte)c.green;
+                                rgb[(x+y*w)*3+2]=(byte)c.blue;
+                                rbw[(x+y*w)*3]=(byte)cc.red;
+                                rbw[(x+y*w)*3+1]=(byte)cc.green;
+                                rbw[(x+y*w)*3+2]=(byte)cc.blue;
+                                if(byt)
+                                    dos.writeByte(c.remap);
+                                else
+                                    dos.writeShort(c.remap);
+                                if(overlay[y][x]!=0 /*|| c.index!=0*/)
+                                    segmented++;
+//                                if(overlay[y][x]!=c.index)
+//                                    changed++;
+                            }
                         pw.println((int)slice.nr+"\t"+(slice.filename!=null?slice.filename:slice.filenames.get(0))+"\t"+segmented+"\t"+changed+"\t"+(segmented-changed)*100/segmented+"%");
                     }
                     BufferedImage bi=new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
