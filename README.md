@@ -4,6 +4,8 @@ VisuAlign is one of several tools developed by by the Nesys laboratory, Universi
 VisuAlign is a stand-alone tool for user guided non-linear spatial registration (anchoring) of sectional image data, typically high resolution histological images,
 to a 3D reference atlas space after a first alignment with QuickNII has been performed.
 
+Currently VisuAlign supports the Allen Mouse Brain Atlas CCFv3, 2015 and 2017 and the Waxholm Space Atlas of the Spraque Dawley Rat v2, v3 and v4.
+
 # Download
 https://www.nitrc.org/frs/?group_id=1426
 
