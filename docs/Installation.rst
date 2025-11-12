@@ -1,4 +1,4 @@
-**Installation and citation**
+**Installation**
 -----------------------------
 
 **System requirements**
