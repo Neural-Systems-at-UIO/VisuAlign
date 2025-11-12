@@ -8,7 +8,9 @@ VisuAlign: Software for 2D image registration to 3D atlas
    introduction
    Installation
    support
-   publications
+   Acknowledgements
+   FAQ
+
  
    
    
@@ -27,7 +29,7 @@ VisuAlign: Software for 2D image registration to 3D atlas
    saving
    atlasversion
    export
-   FAQ
+   publications
    
    
    
