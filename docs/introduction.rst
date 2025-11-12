@@ -1,5 +1,5 @@
 **What is VisuAlign?**
-------------------- 
+======================== 
 VisuAlign is one of several tools developed by the Human Brain Project
 (HBP) with the aim of facilitating brain atlas based analysis and
 integration of experimental data and knowledge about the human and
@@ -19,7 +19,7 @@ VisuAlign is a tool designed for this task. (https://ebrains.eu/service/quicknii
       :height: 3.40345in
 
 **Which atlases are supported?**
-
+---------------------------------
 1. Allen Mouse Brain Atlas Common Coordinate Framework version 3 (2015 and 2017) (CCFv3) (Wang et al. 2020. Cell, https://doi.org/10.1016/j.cell.2020.04.007. Epub 2020 May 7; RRID:JCR_020999 and RRID:JRC_021000) 
 2. Waxholm Atlas of the Sprague Dawley rat, version 3 and 4 (WHS rat brain atlas) (Osen et al. 2019. NeuroImage, https:doi.org/10.1016/j.neuroimage.2019.05.016; Kleven et al. Nat Methods, 2020. https://doi.org/10.1038/s41592-023-02034-3; RRID:SCR_017124)
 3. Developmental Mouse Brain Atlas, version 2 (DeMBA) (Carey et al. 2024. Nat Comm. https://doi.org/10.1038/s41467-025-63177-9; RRID:SCR_025324).
@@ -31,7 +31,7 @@ We encourage researchers who use DeMBA to cite both the dataset and publication 
 -KimLabDev segmentations: Kronman et al. (2024). Developmental mouse brain common coordinate framework. Nature Communications. https://doi.org/10.1038/s41467-024-53254-w
 
 **What is the output of VisuAlign?**
-
+-------------------------------------
 
 -A registration file (JSON format) containing the coordinates of your regisered section images in atlas space. 
 This file is used in the QUINT workflow for quantification of segmented objects from your section images.
