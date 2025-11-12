@@ -35,10 +35,12 @@ International for the main component. Source code: MIT License.
 
 RRID on SciCrunch: (VisuAlign, RRID:SCR_017978)
 
-* Puchades M, Yates SC, Csucs G, Carey H, Balkir A, Leergaard T, Bjaalie J. Software and pipelines for registration and analyses of rodent brain image data in reference atlas space. Frontiers of Neuroinformations. 2025. https://doi.org/10.3389/fninf.2025.1629388 
+* Puchades M, Yates SC, Csucs G, Carey H, Balkir A, Leergaard T, Bjaalie J.
+    Software and pipelines for registration and analyses of rodent brain image data in reference atlas space. Frontiers of Neuroinformations. 2025. https://doi.org/10.3389/   fninf.2025.1629388 
 
 
-* Gurdon B, Yates SC, Csusc G, Groeneboom N, Hadad N, Telpoukhovskaia M, Ouellette A, Ouellette T, O’Connell K, Singh S, Murdy T, Merchant E, Bjerke I, Kleven H, Schlegel U, Leergaard T, Puchades M, Bjaalie J, Kaczorowski C (2023). Detecting the effect of genetic diversity on brain composition in an Alzheimer’s disease mouse model. BioRxiv. DOI: 10.1101/2023.02.27.530226
+* Gurdon B, Yates SC, Csucs G, Groeneboom NE, Hadad N, Telpoukhovskaia M, Ouellette A, Ouellette T, O’Connell KMS, Singh S, Murdy TJ, Merchant E, Bjerke I, Kleven H,      Schlegel U, Leergaard TB, Puchades MA, Bjaalie JG, and Kaczorowski CC.
+   Detecting the effect of genetic diversity on brain composition in an Alzheimer’s disease mouse model. Nature Communications Biology, 2024; 7(605) https://doi.org/10.1038/s42003-024-06242-1
 
 
 **Download**
