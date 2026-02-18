@@ -1,38 +1,101 @@
 {
-    "@context": "https://w3id.org/codemeta/3.0",
-    "type": "SoftwareSourceCode",
-    "author": [
-        {
-            "id": "https://orcid.org/0000-0002-2093-6274",
-            "type": "Person",
-            "affiliation": {
-                "type": "Organization",
-                "name": "NeSys, University of Oslo"
-            },
-            "familyName": "Csucs",
-            "givenName": "Gergely"
-        }
-    ],
-    "codeRepository": "https://github.com/Neural-Systems-at-UIO/VisuAlign.git",
-    "dateCreated": "2019-10-31",
-    "dateModified": "2021-10-11",
-    "datePublished": "2020-01-22",
-    "description": "VisuAlign is a tool for applying user-guided nonlinear refinements (in-plane) to an existing, affine 2D-to-3D registration, such as one created with QuickNII.",
-    "downloadUrl": "https://www.nitrc.org/projects/visualign/",
-    "identifier": "RRID:SCR_017978",
-    "isPartOf": "https://quint-workflow.readthedocs.io/en/latest/",
-    "license": "https://spdx.org/licenses/MIT",
-    "name": "VisuAlign",
-    "operatingSystem": [
-        "Windows",
-        "OS X / macOS"
-    ],
-    "programmingLanguage": "Java",
-    "relatedLink": "https://www.nitrc.org/projects/visualign/",
-    "runtimePlatform": "JRE",
-    "version": "0.9",
-    "developmentStatus": "active",
-    "funding": "H2020-EU.1.2 SGA 720270, H2020-EU.2.3 SGA 785907 and HORIZON-INFRA (EBRAINS 2.0) 101147319",
-    "issueTracker": "https://github.com/Neural-Systems-at-UIO/VisuAlign/issues",
-    "referencePublication": "https://doi.org/10.1371/journal.pone.0216796"
+  "@context": "https://w3id.org/codemeta/3.0",
+  "@type": "SoftwareSourceCode",
+  "name": "VisuAlign",
+  "identifier": "RRID:SCR_017978",
+  "description": "VisuAlign is one of several tools developed by by the Nesys laboratory, University of Oslo with the aim of facilitating brain atlas based analysis and integration of experimental data and knowledge about rodent brains. VisuAlign is a stand-alone tool for user guided non-linear spatial registration (anchoring) of sectional image data, typically high resolution histological images, to a 3D reference atlas space after a first alignment with QuickNII has been performed.",
+  "author": [
+    {
+      "givenName": "Gergely",
+      "familyName": "Csucs",
+      "type": "Person",
+      "id": "https://orcid.org/0000-0002-2093-6274",
+      "affiliation": {
+        "type": "Organization",
+        "name": "NeSys lab, University of Oslo"
+      }
+    },
+    {
+      "givenName": "Sharon C.",
+      "familyName": "Yates",
+      "type": "Person",
+      "id": "https://orcid.org/0000-0002-3001-8725",
+      "affiliation": {
+        "type": "Organization",
+        "name": "NeSys lab, University of Oslo"
+      }
+    },
+    {
+      "givenName": "Maja A.",
+      "familyName": "Puchades",
+      "type": "Person",
+      "id": "https://orcid.org/0000-0002-4536-8197",
+      "affiliation": {
+        "type": "Organization",
+        "name": "NeSys lab, University of Oslo"
+      }
+    },
+    {
+      "givenName": "Jan G.",
+      "familyName": "Bjaalie",
+      "type": "Person",
+      "id": "https://orcid.org/0000-0001-7899-906X",
+      "affiliation": {
+        "type": "Organization",
+        "name": "NeSys lab, University of Oslo"
+      }
+    }
+  ],
+  "license": [
+    "https://spdx.org/licenses/MIT"
+  ],
+  "dateModified": "2021-10-11",
+  "codeRepository": "https://github.com/Neural-Systems-at-UIO/VisuAlign",
+  "downloadUrl": "https://www.nitrc.org/frs/?group_id=1426",
+  "softwareHelp": [
+    "mailto:support@ebrains.eu"
+  ],
+  "operatingSystem": [
+    "Windows",
+    "macOS"
+  ],
+  "developmentStatus": "active",
+  "issueTracker": "https://github.com/Neural-Systems-at-UIO/VisuAlign/issues",
+  "keywords": [
+    "Histology",
+    "Rodent",
+    "Atlas",
+    "Image registration",
+    "non-linear"
+  ],
+  "referencePublication": "https://doi.org/10.3389/fninf.2025.1629388",
+  "maintainer": [
+    {
+      "givenName": "Gergely",
+      "familyName": "Csucs",
+      "type": "Person",
+      "id": "https://orcid.org/0000-0002-2093-6274",
+      "affiliation": {
+        "type": "Organization",
+        "name": "NeSys lab, University of Oslo"
+      }
+    }
+  ],
+  "funder": {
+    "type": "Organization",
+    "name": "H2020-EU FPA (HBP FPA)  650003 and HORIZON-INFRA (EBRAINS 2.0) 101147319"
+  },
+  "version": "0.9",
+  "continuousIntegration": "https://github.com/Neural-Systems-at-UIO/VisuAlign",
+  "programmingLanguage": [
+    "Java"
+  ],
+  "runtimePlatform": "JRE",
+  "availableOnDevice": [
+    "desktop"
+  ],
+  "relatedLink": [
+    "https://visualign.readthedocs.io"
+  ],
+  "applicationCategory": "desktop"
 }
